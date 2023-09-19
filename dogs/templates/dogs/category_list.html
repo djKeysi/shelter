@@ -2,6 +2,9 @@
 {% block content %}
 
     <div class="row">
+        <div class="col-12">
+            <a href="{% url 'dogs:dog_create' %}" class="btn btn-primary mb-5"> Создать собаку</a>
+        </div>
         {% for object in object_list %}
             {% include 'dogs/includes/inc_category.html' %}
         {% endfor %}
