@@ -36,11 +36,15 @@ class IndexView(TemplateView):
 
 class CategoryListView(ListView):
     model = Category
-    #category_item = Category.objects.get(pk=pk)
     extra_context = {
         'title': 'Питомник - все наши породы',
         #'object_list': Dog.objects.filter(category_id=pk, owner=request.user)
     }
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     queryset = queryset.filter(category_id=self.kwargs.get("pk"),owner=queryset.user)
+    #     return queryset
+
 
 
 # def category_dogs(request,pk):
