@@ -141,3 +141,20 @@ AUTH_USER_MODEL = 'users.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.mail.ru'
+# EMAIL_PORT = 465
+# EMAIL_HOST_USER = 'delpiero1493@mail.ru'
+# #EMAIL_HOST_PASSWORD = '096732Dbb'
+# EMAIL_HOST_PASSWORD='BuzbmHpmGMFU6cdwip8B'
+# EMAIL_USE_SSL = True
+
+
+EMAIL_USE_TLS = True
+#EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'evgeniyzenchenko@gmail.com'
+EMAIL_HOST_PASSWORD = '128943mM'
+

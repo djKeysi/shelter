@@ -36,15 +36,17 @@ class IndexView(TemplateView):
 
 class CategoryListView(ListView):
     model = Category
+    #category_item = Category.objects.get(pk=pk)
     extra_context = {
-        'title': 'Питомник - все наши породы'
+        'title': 'Питомник - все наши породы',
+        #'object_list': Dog.objects.filter(category_id=pk, owner=request.user)
     }
 
 
 # def category_dogs(request,pk):
 #     category_item = Category.objects.get(pk=pk)
 #     context = {
-#         'object_list': Dog.objects.filter(category_id=pk),
+#         'object_list': Dog.objects.filter(category_id=pk,owner=request.user),
 #         'title': f'Собаки породы  - все наши породы {category_item.name}',
 #         'category_pk': category_item.pk,
 #     }
@@ -72,6 +74,13 @@ class DogCreateView(CreateView):
     #fields = ('name', 'category',)
     success_url = reverse_lazy('dogs:categories')
     form_class = DogForm
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+        
+        return super().form_valid(form)
 
 
 class DogUpdateView(UpdateView):
