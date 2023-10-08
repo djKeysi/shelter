@@ -14,7 +14,7 @@ class User(AbstractUser):
     telegram = models.CharField(max_length=35, verbose_name='Telegram username', **NULLABLE)
     avatar = models.ImageField(upload_to='users/',verbose_name='аватар', **NULLABLE)
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,**NULLABLE,verbose_name='владелец')
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
