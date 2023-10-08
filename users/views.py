@@ -1,6 +1,8 @@
 import random
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
@@ -28,21 +30,21 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('users:login')
     template_name = 'users/register.html'
 
-    def form_valid(self, form):
-        #self.object = form.save()
-        new_user = form.save()
-        send_mail(
-            subject='Поздравляем с регистрацией',
-            message='Вы зарегистрировались на нашей платформе, добро пожаловать!',
-            from_email=settings.EMAIL_HOST_USER,
-            #recipient_list = [new_user.email, new_user.password]
-            recipient_list=[new_user.email]
+    # def form_valid(self, form):
+    #     #self.object = form.save()
+    #     new_user = form.save()
+    #     send_mail(
+    #         subject='Поздравляем с регистрацией',
+    #         message='Вы зарегистрировались на нашей платформе, добро пожаловать!',
+    #         from_email=settings.EMAIL_HOST_USER,
+    #         #recipient_list = [new_user.email, new_user.password]
+    #         recipient_list=[new_user.email]
+    #
+    #
+    #     )
+    #     return super().form_valid(form)
 
-
-        )
-        return super().form_valid(form)
-
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin,UpdateView):
     model = User
     success_url = reverse_lazy('users:profile')
     form_class = UserForm
@@ -50,6 +52,7 @@ class UserUpdateView(UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
+@login_required
 def generate_new_password(request):
     new_password = ''.join([str(random.randint(0,9)) for _ in range(12)])
     send_mail(

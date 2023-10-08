@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -15,7 +16,10 @@ from dogs.models import Category, Dog, Parent
 #     return render(request, 'dogs/index.html', context)
 
 
-class IndexView(TemplateView):
+
+
+
+class IndexView(LoginRequiredMixin,TemplateView):
     template_name = 'dogs/index.html'
     extra_context = {
         'title': 'Питомник - Главная'
@@ -34,17 +38,21 @@ class IndexView(TemplateView):
 #     }
 #     return render(request, 'dogs/categories.html',context)
 
-class CategoryListView(ListView):
+class CategoryListView(LoginRequiredMixin,ListView):
     model = Category
     extra_context = {
         'title': 'Питомник - все наши породы',
-        #'object_list': Dog.objects.filter(category_id=pk, owner=request.user)
+        # 'object_list': Dog.objects.filter(category_id=pk,
+        # owner=request.user)
     }
-    # def get_queryset(self):
-    #     queryset = super().get_queryset()
-    #     queryset = queryset.filter(category_id=self.kwargs.get("pk"),owner=queryset.user)
-    #     return queryset
 
+    def get_object(self):
+        #queryset = super().get_queryset()
+        #queryset =queryset.filter(category_id=self.kwargs.get("pk"), owner=self.queryset.user)
+
+        #queryset = queryset.filter(category_id=self.kwargs.get("pk"), owner=queryset.user)
+       # return queryset
+        return self.queryset.user
 
 
 # def category_dogs(request,pk):
@@ -56,13 +64,15 @@ class CategoryListView(ListView):
 #     }
 #     return render(request, 'dogs/dogs_list.html',context)
 
-class DogListView(ListView):
+class DogListView(LoginRequiredMixin,ListView):
     model = Dog
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.filter(category_id=self.kwargs.get("pk"))
-        return queryset
+        return super().get_queryset().filter(category_id=self.kwargs.get("pk"),owner=self.request.user)
+        # queryset = super().get_queryset()
+        # queryset = queryset.filter(category_id=self.kwargs.get("pk"))
+        # return queryset
+
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(*args, **kwargs)
@@ -73,9 +83,9 @@ class DogListView(ListView):
         return context_data
 
 
-class DogCreateView(CreateView):
+class DogCreateView(LoginRequiredMixin,CreateView):
     model = Dog
-    #fields = ('name', 'category',)
+    # fields = ('name', 'category',)
     success_url = reverse_lazy('dogs:categories')
     form_class = DogForm
 
@@ -83,23 +93,24 @@ class DogCreateView(CreateView):
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
-        
+
         return super().form_valid(form)
 
 
-class DogUpdateView(UpdateView):
+class DogUpdateView(LoginRequiredMixin,UpdateView):
     model = Dog
     form_class = DogForm
-    #success_url = reverse_lazy('dogs:categories')
+
+    # success_url = reverse_lazy('dogs:categories')
 
     def get_success_url(self):
         return reverse('dogs:dog_update', args=[self.object.category.pk])
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        ParentFormSet = inlineformset_factory(Dog,Parent,form =ParentForm,extra=1)
+        ParentFormSet = inlineformset_factory(Dog, Parent, form=ParentForm, extra=1)
         if self.request.method == 'POST':
-            formset = ParentFormSet(self.request.POST,instance=self.object)
+            formset = ParentFormSet(self.request.POST, instance=self.object)
         else:
             formset = ParentFormSet(instance=self.object)
         context_data['formset'] = formset
@@ -119,6 +130,6 @@ class DogUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class DogDeleteView(DeleteView):
+class DogDeleteView(LoginRequiredMixin,DeleteView):
     model = Dog
     success_url = reverse_lazy('dogs:categories')
